@@ -64,21 +64,22 @@ public class DisturbingFeedbackCollector {
             System.out.println("Hash : " + imgHash);
 
             FeedbackObject feedbackItem = ds.get(FeedbackObject.class, imgHash);
-            if (feedbackItem == null) {
-                feedbackItem = new FeedbackObject();
-                ObjectManagement.downloadURL(url, Configuration.QUEUE_IMAGE_PATH , imgHash);
-                feedbackItem.id=imgHash;
-                feedbackItem.sourceURL=url;
-                feedbackItem.score=score;
-                feedbackItem.desired_score=desired_score;
-                ds.save(feedbackItem);
-                mongoclient.close();
-                return "ok";
-            } else
-            {
-                mongoclient.close();
-                return "exists";
+            int count = 0;
+            while (feedbackItem != null) {
+                imgHash = imgHash + "_";
+                feedbackItem = ds.get(FeedbackObject.class, imgHash);
+                count += 1;
             }
+            System.out.println("Found " + String.valueOf(count) + " other instances. Adding this one.");
+            feedbackItem = new FeedbackObject();
+            ObjectManagement.downloadURL(url, Configuration.QUEUE_IMAGE_PATH , imgHash);
+            feedbackItem.id=imgHash;
+            feedbackItem.sourceURL=url;
+            feedbackItem.score=score;
+            feedbackItem.desired_score=desired_score;
+            ds.save(feedbackItem);
+            mongoclient.close();
+            return "ok";
         } catch (Exception ex) {
             ex.printStackTrace();
             mongoclient.close();
