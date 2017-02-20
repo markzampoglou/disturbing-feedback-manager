@@ -3,6 +3,7 @@ package gr.iti.mklab.reveal.web;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import gr.iti.mklab.reveal.dnn.api.FeedbackObject;
 import gr.iti.mklab.reveal.dnn.api.ObjectManagement;
 
@@ -48,7 +49,8 @@ public class DisturbingFeedbackCollector {
     @ResponseBody
     public String disturbing_feedback(@RequestParam(value = "url", required = true) String url, @RequestParam(value = "score", required = true) Float score, @RequestParam(value = "desired_score", required = true) Float desired_score){
         System.out.println("Received feedback on erroneous classification");
-        MongoClient mongoclient = new MongoClient(Configuration.MONGO_HOST, 27017);
+        MongoClientURI mongoURI = new MongoClientURI(Configuration.MONGO_URI);
+        MongoClient mongoclient = new MongoClient(mongoURI);
         Morphia morphia = new Morphia();
         morphia.map(FeedbackObject.class);
         Datastore ds = new Morphia().createDatastore(mongoclient, "DisturbingFeedback");
